@@ -5,77 +5,89 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Rohit Quotes</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
-  body {
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+body {
     margin: 0;
     font-family: 'Roboto', sans-serif;
     background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-    color: #fff;
     display: flex;
     justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-  }
-  .container {
-    max-width: 600px;
-    padding: 30px;
-    background: rgba(255,255,255,0.08);
-    backdrop-filter: blur(15px);
-    border-radius: 20px;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.4);
-  }
-  .header {
+    padding: 50px 20px;
+    color: #fff;
+}
+
+.container {
+    max-width: 700px;
+    width: 100%;
+}
+
+.header {
     text-align: center;
-    margin-bottom: 25px;
-  }
-  .header h1 {
-    font-size: 26px;
+    margin-bottom: 30px;
+}
+
+.header h1 {
+    font-size: 28px;
     margin: 0;
     font-weight: 700;
-  }
-  .header p {
+}
+
+.header p {
     font-size: 14px;
     opacity: 0.7;
-    margin: 0;
-  }
-  .quote-card {
-    background: rgba(255,255,255,0.1);
+}
+
+.quote-card {
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(12px);
+    border-radius: 20px;
     padding: 25px;
-    border-radius: 15px;
     margin-bottom: 20px;
-    text-align: center;
-    transition: all 0.3s ease;
-  }
-  .quote-card:hover {
+    box-shadow: 0 10px 35px rgba(0,0,0,0.3);
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.quote-card:hover {
     transform: scale(1.02);
-    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-  }
-  .quote {
+    box-shadow: 0 15px 50px rgba(0,0,0,0.4);
+}
+
+.quote {
     font-size: 22px;
-    line-height: 1.4;
-    margin-bottom: 15px;
-  }
-  .quote .highlight {
-    font-weight: 700;
+    line-height: 1.5;
+    margin-bottom: 12px;
+}
+
+.quote .highlight {
     color: #38bdf8;
-  }
-  .author {
+    font-weight: 700;
+}
+
+.author {
     font-size: 16px;
     opacity: 0.8;
-    margin-bottom: 8px;
-  }
-  .category {
+    margin-bottom: 5px;
+}
+
+.category {
+    display: inline-block;
     font-size: 12px;
-    opacity: 0.6;
-    margin-bottom: 12px;
-  }
-  .reflection {
+    background: #0ea5e9;
+    color: #000;
+    padding: 4px 10px;
+    border-radius: 20px;
+    margin-bottom: 10px;
+}
+
+.reflection {
     font-size: 14px;
     font-style: italic;
     opacity: 0.85;
     margin-bottom: 15px;
-  }
-  button {
+}
+
+button {
     background: #38bdf8;
     color: #000;
     border: none;
@@ -84,40 +96,61 @@
     font-weight: 700;
     cursor: pointer;
     transition: 0.3s;
-  }
-  button:hover {
+}
+
+button:hover {
     background: #0ea5e9;
     transform: scale(1.05);
-  }
-  footer {
+}
+
+footer {
     text-align: center;
-    margin-top: 25px;
     font-size: 12px;
     opacity: 0.5;
-  }
+    margin-top: 30px;
+}
+
+/* Extra: Multiple quote cards for history */
+.history {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 20px;
+}
+.history .quote-card {
+    padding: 15px;
+    background: rgba(255,255,255,0.05);
+    font-size: 14px;
+}
 </style>
 </head>
 <body>
+
 <div class="container">
-  <div class="header">
-    <h1>Daily Quotes by Rohit</h1>
-    <p>Modern reflections for growth & mindset</p>
-  </div>
+    <div class="header">
+        <h1>Daily Quotes by Rohit</h1>
+        <p>Modern reflections for growth & mindset</p>
+    </div>
 
-  <div class="quote-card">
-    <div class="quote" id="quote">Loading...</div>
-    <div class="author" id="author"></div>
-    <div class="category" id="category"></div>
-    <div class="reflection" id="reflection"></div>
-    <button onclick="showQuote()" id="cta">Next Quote</button>
-  </div>
+    <div class="quote-card" id="current-quote">
+        <div class="quote" id="quote">Loading...</div>
+        <div class="author" id="author"></div>
+        <div class="category" id="category"></div>
+        <div class="reflection" id="reflection"></div>
+        <button onclick="showQuote()" id="cta">Next Quote</button>
+    </div>
 
-  <footer>© Rohit Quotes</footer>
+    <div class="history" id="history">
+        <!-- Last 2 quotes will appear here -->
+    </div>
+
+    <footer>© Rohit Quotes | Share your thoughts on Instagram</footer>
 </div>
 
 <script>
 const SHEET_URL = "https://opensheet.elk.sh/1ZB0qKyDQJPUCw5WHnalNs6LiDxyau_gS5ZzHaFd_DXM/Sheet1";
 let quotes = [];
+let historyQuotes = [];
 
 fetch(SHEET_URL)
 .then(res => res.json())
@@ -133,12 +166,29 @@ fetch(SHEET_URL)
 function showQuote() {
     if(!quotes.length) return;
     const q = quotes[Math.floor(Math.random() * quotes.length)];
+
+    // Current quote
     document.getElementById("quote").innerHTML = `"${q.Quote.replace(q.Highlight, `<span class='highlight'>${q.Highlight}</span>`)}"`;
     document.getElementById("author").innerText = `— ${q.Author}`;
     document.getElementById("category").innerText = q.Category;
     document.getElementById("reflection").innerText = q.Reflection;
     document.getElementById("cta").innerText = q.CTA || "Next Quote";
+
+    // Add to history
+    historyQuotes.unshift(q);
+    if(historyQuotes.length > 2) historyQuotes.pop();
+
+    const historyDiv = document.getElementById("history");
+    historyDiv.innerHTML = "";
+    historyQuotes.slice(1).forEach(hq => {
+        const div = document.createElement("div");
+        div.className = "quote-card";
+        div.innerHTML = `<div class="quote">"${hq.Quote}"</div>
+                         <div class="author">— ${hq.Author}</div>`;
+        historyDiv.appendChild(div);
+    });
 }
 </script>
+
 </body>
 </html>
