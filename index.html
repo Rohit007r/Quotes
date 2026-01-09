@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Modern Quotes</title>
+
+<style>
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+  }
+
+  .container {
+    max-width: 520px;
+    padding: 30px;
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(15px);
+    border-radius: 20px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+    text-align: center;
+  }
+
+  .quote {
+    font-size: 24px;
+    line-height: 1.4;
+    margin-bottom: 20px;
+  }
+
+  .author {
+    font-size: 16px;
+    opacity: 0.85;
+    margin-bottom: 5px;
+  }
+
+  .category {
+    font-size: 13px;
+    opacity: 0.6;
+    margin-bottom: 25px;
+  }
+
+  button {
+    background: #38bdf8;
+    color: #000;
+    border: none;
+    padding: 12px 22px;
+    font-size: 14px;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+
+  button:hover {
+    background: #0ea5e9;
+    transform: scale(1.05);
+  }
+
+  footer {
+    margin-top: 25px;
+    font-size: 12px;
+    opacity: 0.4;
+  }
+</style>
+</head>
+
+<body>
+
+<div class="container">
+  <div class="quote" id="quote">Loading...</div>
+  <div class="author" id="author"></div>
+  <div class="category" id="category"></div>
+
+  <button onclick="showQuote()">New Quote</button>
+
+  <footer>© Rohit Quotes</footer>
+</div>
+
+<script>
+  const SHEET_URL = "https://opensheet.elk.sh/1ZB0qKyDQJPUCw5WHnalNs6LiDxyau_gS5ZzHaFd_DXM/Sheet1";
+  let quotes = [];
+
+  fetch(SHEET_URL)
+    .then(res => res.json())
+    .then(data => {
+      quotes = data;
+      showQuote();
+    })
+    .catch(() => {
+      document.getElementById("quote").innerText = "Unable to load quotes";
+    });
+
+  function showQuote() {
+    if (!quotes.length) return;
+    const q = quotes[Math.floor(Math.random() * quotes.length)];
+
+    document.getElementById("quote").innerText = `"${q.Quote}"`;
+    document.getElementById("author").innerText = `— ${q.Author}`;
+    document.getElementById("category").innerText = q.Category;
+  }
+</script>
+
+</body>
+</html>
