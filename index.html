@@ -3,107 +3,142 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Modern Quotes</title>
-
+<title>Rohit Quotes</title>
 <style>
+  @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
   body {
     margin: 0;
-    font-family: 'Segoe UI', sans-serif;
+    font-family: 'Roboto', sans-serif;
     background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-    min-height: 100vh;
+    color: #fff;
     display: flex;
     justify-content: center;
     align-items: center;
-    color: #fff;
+    min-height: 100vh;
   }
-
   .container {
-    max-width: 520px;
+    max-width: 600px;
     padding: 30px;
     background: rgba(255,255,255,0.08);
     backdrop-filter: blur(15px);
     border-radius: 20px;
     box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+  }
+  .header {
     text-align: center;
-  }
-
-  .quote {
-    font-size: 24px;
-    line-height: 1.4;
-    margin-bottom: 20px;
-  }
-
-  .author {
-    font-size: 16px;
-    opacity: 0.85;
-    margin-bottom: 5px;
-  }
-
-  .category {
-    font-size: 13px;
-    opacity: 0.6;
     margin-bottom: 25px;
   }
-
+  .header h1 {
+    font-size: 26px;
+    margin: 0;
+    font-weight: 700;
+  }
+  .header p {
+    font-size: 14px;
+    opacity: 0.7;
+    margin: 0;
+  }
+  .quote-card {
+    background: rgba(255,255,255,0.1);
+    padding: 25px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+    text-align: center;
+    transition: all 0.3s ease;
+  }
+  .quote-card:hover {
+    transform: scale(1.02);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+  }
+  .quote {
+    font-size: 22px;
+    line-height: 1.4;
+    margin-bottom: 15px;
+  }
+  .quote .highlight {
+    font-weight: 700;
+    color: #38bdf8;
+  }
+  .author {
+    font-size: 16px;
+    opacity: 0.8;
+    margin-bottom: 8px;
+  }
+  .category {
+    font-size: 12px;
+    opacity: 0.6;
+    margin-bottom: 12px;
+  }
+  .reflection {
+    font-size: 14px;
+    font-style: italic;
+    opacity: 0.85;
+    margin-bottom: 15px;
+  }
   button {
     background: #38bdf8;
     color: #000;
     border: none;
-    padding: 12px 22px;
-    font-size: 14px;
+    padding: 12px 25px;
     border-radius: 30px;
+    font-weight: 700;
     cursor: pointer;
     transition: 0.3s;
   }
-
   button:hover {
     background: #0ea5e9;
     transform: scale(1.05);
   }
-
   footer {
+    text-align: center;
     margin-top: 25px;
     font-size: 12px;
-    opacity: 0.4;
+    opacity: 0.5;
   }
 </style>
 </head>
-
 <body>
-
 <div class="container">
-  <div class="quote" id="quote">Loading...</div>
-  <div class="author" id="author"></div>
-  <div class="category" id="category"></div>
+  <div class="header">
+    <h1>Daily Quotes by Rohit</h1>
+    <p>Modern reflections for growth & mindset</p>
+  </div>
 
-  <button onclick="showQuote()">New Quote</button>
+  <div class="quote-card">
+    <div class="quote" id="quote">Loading...</div>
+    <div class="author" id="author"></div>
+    <div class="category" id="category"></div>
+    <div class="reflection" id="reflection"></div>
+    <button onclick="showQuote()" id="cta">Next Quote</button>
+  </div>
 
   <footer>© Rohit Quotes</footer>
 </div>
 
 <script>
-  const SHEET_URL = "https://opensheet.elk.sh/1ZB0qKyDQJPUCw5WHnalNs6LiDxyau_gS5ZzHaFd_DXM/Sheet1";
-  let quotes = [];
+const SHEET_URL = "https://opensheet.elk.sh/1ZB0qKyDQJPUCw5WHnalNs6LiDxyau_gS5ZzHaFd_DXM/Sheet1";
+let quotes = [];
 
-  fetch(SHEET_URL)
-    .then(res => res.json())
-    .then(data => {
-      quotes = data;
-      showQuote();
-    })
-    .catch(() => {
-      document.getElementById("quote").innerText = "Unable to load quotes";
-    });
+fetch(SHEET_URL)
+.then(res => res.json())
+.then(data => {
+    quotes = data.filter(q => q.Status === "Active");
+    showQuote();
+})
+.catch(err => {
+    document.getElementById("quote").innerText = "Failed to load quotes";
+    console.error(err);
+});
 
-  function showQuote() {
-    if (!quotes.length) return;
+function showQuote() {
+    if(!quotes.length) return;
     const q = quotes[Math.floor(Math.random() * quotes.length)];
-
-    document.getElementById("quote").innerText = `"${q.Quote}"`;
+    document.getElementById("quote").innerHTML = `"${q.Quote.replace(q.Highlight, `<span class='highlight'>${q.Highlight}</span>`)}"`;
     document.getElementById("author").innerText = `— ${q.Author}`;
     document.getElementById("category").innerText = q.Category;
-  }
+    document.getElementById("reflection").innerText = q.Reflection;
+    document.getElementById("cta").innerText = q.CTA || "Next Quote";
+}
 </script>
-
 </body>
 </html>
